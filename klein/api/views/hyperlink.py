@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from api import models, serializers
-from api.utils import decode_hyperlink_id
+from api.utils import decode_hyperlink_id, get_client_ip
 
 
 class HyperlinkViewSet(viewsets.ModelViewSet):
@@ -31,6 +31,11 @@ class HyperlinkRedirectView(APIView):
             alias=slug
         )
         if hyperlink_aliases.exists():
+            models.HyperlinkView.objects.create(
+                ip_address=get_client_ip(request),
+                hyperlink_alias=hyperlink_aliases.first(),
+                hyperlink=hyperlink_aliases.first().hyperlink
+            )
             return HttpResponseRedirect(hyperlink_aliases.first().hyperlink.url)
 
         # See if it's a Hyperlink with a slug that was taken by an alias
@@ -42,6 +47,11 @@ class HyperlinkRedirectView(APIView):
             id=decode_hyperlink_id(slug)
         )
         if hyperlinks.exists():
+            models.HyperlinkView.objects.create(
+                ip_address=get_client_ip(request),
+                hyperlink_alias=None,
+                hyperlink=hyperlinks.first()
+            )
             return HttpResponseRedirect(hyperlinks.first().url)
         else:
             raise Http404('Short URL does not exist')
