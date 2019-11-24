@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework import serializers
 from api import models
 from api.utils import encode_hyperlink_id
@@ -11,4 +12,7 @@ class HyperlinkSerializer(serializers.ModelSerializer):
         fields = ['id', 'url', 'short_url', 'created_on']
 
     def get_short_url(self, instance):
-        return encode_hyperlink_id(instance.id)
+        return '%s/%s' % (
+            settings.BASE_URL,
+            encode_hyperlink_id(instance.id),
+        )

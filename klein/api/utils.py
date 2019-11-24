@@ -7,6 +7,7 @@ Inspired by the PHP base_convert function and this implementation:
 https://www.php2python.com/wiki/function.base-convert/
 '''
 
+
 def encode_hyperlink_id(id):
     chars = settings.URL_CHARS
     encoded_id = ''
