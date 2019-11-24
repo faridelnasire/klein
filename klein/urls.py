@@ -23,5 +23,6 @@ router.register(r'api/hyperlink', views.HyperlinkViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('admin/', admin.site.urls),
+    path('admin', admin.site.urls),
+    path('<str:slug>', views.HyperlinkRedirectView.as_view())
 ]
