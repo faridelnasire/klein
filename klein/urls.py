@@ -20,6 +20,7 @@ from api import views
 
 router = DefaultRouter()
 router.register(r'api/hyperlink', views.HyperlinkViewSet)
+router.register(r'api/hyperlink-alias', views.HyperlinkAliasViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
