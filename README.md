@@ -3,10 +3,10 @@
 
 ## Roadmap
 - Encode endpoint
-api/encode
+`api/encode`
 - Decode endpoint
-api/decode
+`api/decode`
 - Redirect endpoint
-/:slug
+`/:slug`
 - GUI endpoint
-/app/*
+`/app/*`
