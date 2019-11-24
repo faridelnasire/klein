@@ -16,3 +16,12 @@ class HyperlinkSerializer(serializers.ModelSerializer):
             settings.BASE_URL,
             encode_hyperlink_id(instance.id),
         )
+
+    def create(self, validated_data):
+        existing_hyperlinks = models.Hyperlink.objects.filter(
+            url__iexact=validated_data['url']
+        )
+        if existing_hyperlinks.exists():
+            return existing_hyperlinks.first()
+
+        return models.Hyperlink.objects.create(**validated_data)
