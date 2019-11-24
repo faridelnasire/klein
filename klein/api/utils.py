@@ -1,6 +1,12 @@
 from django.conf import settings
 
 
+'''
+These 2 functions convert the Base10 Hyperlink.id value to a Base62 short url.
+Inspired by the PHP base_convert function and this implementation:
+https://www.php2python.com/wiki/function.base-convert/
+'''
+
 def encode_hyperlink_id(id):
     chars = settings.URL_CHARS
     encoded_id = ''
