@@ -8,4 +8,5 @@ class Hyperlink(models.Model):
         blank=True,
         null=True
     )
-    url = models.CharField(max_length=2048)
+    url = models.URLField(max_length=2048)
+    created_on = models.DateTimeField(auto_now_add=True)
