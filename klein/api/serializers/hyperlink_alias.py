@@ -1,4 +1,3 @@
-from django.http import HttpResponseBadRequest
 from rest_framework import serializers
 from api import models
 from api.utils import decode_hyperlink_id
