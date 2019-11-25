@@ -1,4 +1,5 @@
 from django.conf import settings
+from api import models
 
 
 '''
@@ -37,3 +38,14 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
+
+
+def log_hyperlink_view(request, hyperlink=None, hyperlink_alias=None):
+    if hyperlink_alias:
+        hyperlink = hyperlink_alias.hyperlink
+
+    return models.HyperlinkView.objects.create(
+        ip_address=get_client_ip(request),
+        hyperlink_alias=hyperlink_alias,
+        hyperlink=hyperlink
+    )

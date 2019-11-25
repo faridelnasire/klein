@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from api import models, serializers
-from api.utils import decode_hyperlink_id, get_client_ip
+from api.utils import decode_hyperlink_id, get_client_ip, log_hyperlink_view
 
 
 class HyperlinkViewSet(viewsets.ModelViewSet):
@@ -27,31 +27,29 @@ class HyperlinkRedirectView(APIView):
             raise Http404('Short URL does not exist')
 
         # See if an alias exists
-        hyperlink_aliases = models.HyperlinkAlias.objects.filter(
-            alias=slug
-        )
+        hyperlink_aliases = models.HyperlinkAlias.objects.filter(alias=slug)
         if hyperlink_aliases.exists():
-            models.HyperlinkView.objects.create(
-                ip_address=get_client_ip(request),
-                hyperlink_alias=hyperlink_aliases.first(),
-                hyperlink=hyperlink_aliases.first().hyperlink
+            log_hyperlink_view(
+                request=request,
+                hyperlink_alias=hyperlink_aliases.first()
             )
-            return HttpResponseRedirect(hyperlink_aliases.first().hyperlink.url)
-
-        # See if it's a Hyperlink with a slug that was taken by an alias
-        if slug[0] == '_':
-            slug = slug[1:]
-
-        # See if Hyperlink exists
-        hyperlinks = models.Hyperlink.objects.filter(
-            id=decode_hyperlink_id(slug)
-        )
-        if hyperlinks.exists():
-            models.HyperlinkView.objects.create(
-                ip_address=get_client_ip(request),
-                hyperlink_alias=None,
-                hyperlink=hyperlinks.first()
-            )
-            return HttpResponseRedirect(hyperlinks.first().url)
+            redirect_url = hyperlink_aliases.first().hyperlink.url
         else:
-            raise Http404('Short URL does not exist')
+            # See if it's a Hyperlink with a slug that was taken by an alias
+            if slug[0] == '_':
+                slug = slug[1:]
+
+            # See if Hyperlink exists
+            hyperlinks = models.Hyperlink.objects.filter(
+                id=decode_hyperlink_id(slug)
+            )
+            if hyperlinks.exists():
+                log_hyperlink_view(
+                    request=request,
+                    hyperlink=hyperlinks.first()
+                )
+                redirect_url = hyperlinks.first().url
+            else:
+                raise Http404('Short URL does not exist')
+
+        return HttpResponseRedirect(redirect_url)
