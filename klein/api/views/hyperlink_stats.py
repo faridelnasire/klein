@@ -1,3 +1,5 @@
+import datetime
+import itertools
 from django.http import Http404
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -39,8 +41,15 @@ class HyperlinkStatsView(APIView):
 
         ip_addresses = hyperlink_history.values_list('ip_address', flat=True).distinct()
 
+        grouped_views = itertools.groupby(
+            hyperlink_history.values('viewed_on'),
+            lambda d: d.get('viewed_on').strftime('%Y-%m-%d')
+        )
+        hits_timeseries = [(day, len(list(this_day))) for day, this_day in grouped_views]
+
         return Response({
             'created_on': created_on,
             'total_hits': len(hyperlink_history),
-            'total_users': len(ip_addresses)
+            'total_users': len(ip_addresses),
+            'hits_timeseries': hits_timeseries
         })
